@@ -24,41 +24,50 @@ model     = AutoModelForCausalLM.from_pretrained(
 #model.gradient_checkpointing_enable()
 
 class ReverseDataset(Dataset):
-    def __init__(self, csv_path, tokenizer, max_length=30):
+    def __init__(self, csv_path, tokenizer, max_length=30, device="cpu"):
         df = pd.read_csv(csv_path).dropna(subset=["word"])
-        # build (prompt, reversed) pairs
-        self.examples = [
-            (str(w), str(w)[::-1])
-            for w in df["word"]
-        ]
+        self.examples = [(w, w[::-1]) for w in df["word"].astype(str)]
         random.shuffle(self.examples)
-        self.tokenizer = tokenizer
+
+        self.tk = tokenizer
+        self.eos_id = tokenizer.eos_token_id
+        self.pad_id = tokenizer.pad_token_id
         self.max_length = max_length
+        self.device = device
 
     def __len__(self):
         return len(self.examples)
 
     def __getitem__(self, idx):
         prompt, rev = self.examples[idx]
-        # tokenize prompt only to get its length
-        p_ids = self.tokenizer(prompt, add_special_tokens=False).input_ids
-        p_len = len(p_ids)
 
-        full = f"{prompt} {rev} {tokenizer.eos_token}" # add eos token
-        enc  = self.tokenizer(
-            full,
-            truncation=True,
-            padding="max_length",
-            max_length=self.max_length,
-            return_tensors="pt"
-        )
-        input_ids      = enc.input_ids.squeeze(0).to(device)
-        attention_mask = enc.attention_mask.squeeze(0).to(device)
+        # 1) tokenize prompt and reversed word separately
+        prompt_ids = self.tk(prompt, add_special_tokens=False).input_ids
+        rev_ids    = self.tk(rev,    add_special_tokens=False).input_ids
 
-        # labels: mask prompt & pad, predict only reversed tokens
+        # 2) build full sequence: prompt + reversed + EOS
+        full_ids = prompt_ids + rev_ids + [self.eos_id]
+
+        # 3) create attention mask + pad up to max_length
+        seq_len = len(full_ids)
+        if seq_len > self.max_length:
+            # truncate if too long (rare for single words)
+            full_ids = full_ids[:self.max_length]
+            attention_mask = [1]*self.max_length
+        else:
+            attention_mask = [1]*seq_len + [0]*(self.max_length - seq_len)
+            full_ids       = full_ids + [self.pad_id]*(self.max_length - seq_len)
+
+        input_ids = torch.tensor(full_ids, dtype=torch.long).to(self.device)
+        attention_mask = torch.tensor(attention_mask, dtype=torch.long).to(self.device)
+
+        # 4) build labels: mask prompt only, keep rev + EOS, mask padding
         labels = input_ids.clone()
-        labels[:p_len]            = -100
-        labels[attention_mask==0] = -100
+        # mask prompt tokens
+        labels[:len(prompt_ids)] = -100
+        # leave rev_ids and the EOS unmasked
+        # mask padding
+        labels[attention_mask == 0] = -100
 
         return {
             "input_ids":      input_ids,
@@ -66,7 +75,7 @@ class ReverseDataset(Dataset):
             "labels":         labels,
         }
 
-train_dataset = ReverseDataset("palindromes_dataset_233_709.csv", tokenizer, max_length=30)
+train_dataset = ReverseDataset("palindromes_dataset_233_709.csv", tokenizer, max_length=30, device=device)
 
 training_args = TrainingArguments(
     output_dir="./reverse-finetuned",
