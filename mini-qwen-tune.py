@@ -84,7 +84,7 @@ training_args = TrainingArguments(
     logging_steps=80,
     save_strategy="no",
     save_total_limit=1,
-    evaluation_strategy="epoch",
+    eval_strategy="epoch",
     fp16=False,
     optim="adamw_torch",
 )
