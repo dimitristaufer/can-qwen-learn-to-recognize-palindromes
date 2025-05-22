@@ -1,6 +1,6 @@
 # palin-bench: Reversing Words with Hugging Face Language Models
 
-This repo fine-tunes Hugging Face causal language models to **reverse input words** — a deliberately unnatural task (character-level transformations like reversing a word are not meaningful language modeling tasks) that serves as a lightweight benchmark for evaluating performance of Apple M-Series devices for fine-tuning via MPS.
+This repo fine-tunes Hugging Face causal language models to **reverse input words** — a deliberately unnatural task (character-level transformations like reversing a word are not meaningful language modeling tasks) that serves as a lightweight benchmark for evaluating performance of Apple M-series devices for fine-tuning via MPS.
 
 ---
 
@@ -10,7 +10,7 @@ This repo fine-tunes Hugging Face causal language models to **reverse input word
 |------------------|----------------------|------------|------------------------|
 | M2 Max, 30 Cores (32 GB)    | Qwen/Qwen3-0.6B-Base | 2.74       | x.xx                   |
 
-> 🧪 **PRs welcome!** Add your own results (any model / any M-Series device).
+> 🧪 **PRs welcome!** Add your own results (any model / any M-series device).
 
 ---
 
