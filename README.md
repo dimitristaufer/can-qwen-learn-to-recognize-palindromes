@@ -8,7 +8,7 @@ This repo fine-tunes Hugging Face causal language models to **reverse input word
 
 | Device           | Model                | avg it/s | eval_loss (5 Epochs) |
 |------------------|----------------------|------------|------------------------|
-| M2 Max, 30 Cores (32 GB)    | Qwen/Qwen3-0.6B-Base | 2.74       | x.xx                   |
+| M2 Max, 30 Cores (32 GB)    | Qwen/Qwen3-0.6B-Base | 2.73       | 3.65                   |
 
 > 🧪 **PRs welcome!** Add your own results (any model / any M-series device).
 
