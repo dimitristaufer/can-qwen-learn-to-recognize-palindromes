@@ -6,7 +6,7 @@ This repo fine-tunes Hugging Face causal language models to **reverse input word
 
 ## 💻 Benchmarks
 
-| Device           | Model                | Tokens/sec | Final Loss (5 Epochs) |
+| Device           | Model                | avg it/s | eval_loss (5 Epochs) |
 |------------------|----------------------|------------|------------------------|
 | M2 Max, 30 Cores (32 GB)    | Qwen/Qwen3-0.6B-Base | 2.74       | x.xx                   |
 
