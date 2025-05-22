@@ -1,4 +1,4 @@
-# palin-bench: Reversing Words with Hugging Face Language Models
+# palin-bench: Can M-series Macs be Used to Fine-Tune LLMs?
 
 This repo fine-tunes Hugging Face causal language models to **reverse input words** — a deliberately unnatural task (character-level transformations like reversing a word are not meaningful language modeling tasks) that serves as a lightweight benchmark for evaluating performance of Apple M-series devices for fine-tuning via MPS.
 
